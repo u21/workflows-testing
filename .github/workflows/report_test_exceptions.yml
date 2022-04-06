@@ -1,4 +1,4 @@
-name: Enforce Tests for PR (to be deleted after testing)
+name: Report Test exceptions
 
 on:
   pull_request:
@@ -64,7 +64,7 @@ jobs:
               tags:
                 - "repo_name:${{ github.repository }}"
                 - "merged_by:${{ github.actor }}"
-      #           - "size:${{ steps.pr-size.outputs.size }}"
+                - "size:${{ steps.pr-size.outputs.size }}"
       #
       # - name: Store metrics for compliant cases
       #   if: !contains(steps.pr-labels.outputs.labels, ' test-not-required ')
