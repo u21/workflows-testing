@@ -21,7 +21,7 @@ jobs:
         uses: ammaratef45/pr-url-action@v1
 
       - name: Report to slack if contains label
-        if: contains(steps.pr-labels.outputs.labels, ' test-not-required ')
+        if: contains(steps.pr-labels.outputs.labels, ' tests-not-required ')
         uses: rtCamp/action-slack-notify@v2
         env:
           SLACK_TITLE: Psst! Someone invoked EXCEPTION TO TESTS
@@ -52,7 +52,7 @@ jobs:
           fi
 
       - name: Store metrics for exception cases
-        if: contains(steps.pr-labels.outputs.labels, ' test-not-required ')
+        if: contains(steps.pr-labels.outputs.labels, ' tests-not-required ')
         uses: masci/datadog@v1
         with:
           api-key: ${{ secrets.DATADOG_API_KEY }}
@@ -67,7 +67,7 @@ jobs:
                 - "size:${{ steps.pr-size.outputs.size }}"
       #
       # - name: Store metrics for compliant cases
-      #   if: !contains(steps.pr-labels.outputs.labels, ' test-not-required ')
+      #   if: !contains(steps.pr-labels.outputs.labels, ' tests-not-required ')
       #   uses: masci/datadog@v1
       #   with:
       #     api-key: ${{ secrets.DATADOG_API_KEY }}
