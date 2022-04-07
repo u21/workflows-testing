@@ -10,6 +10,7 @@ on:
         required: true
       DATADOG_API_KEY:
         required: true
+      SLACK_USER:
 
 jobs:
   get-labels:
@@ -55,12 +56,13 @@ jobs:
         uses: rtCamp/action-slack-notify@v2
         env:
           SLACK_TITLE: Psst! Someone invoked EXCEPTION TO TESTS
-          SLACK_MESSAGE: "Test writing is skipped! Here's the PR ${{ steps.pr-url.outputs.url }}. Please explain why tests are not written for this PR."
+          SLACK_MESSAGE: "Test writing is skipped! Here's the PR ${{ steps.pr-url.outputs.url }}. Please explain why tests are not written for this PR. <@${{ secrets.SLACK_USER }}>"
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_CHANNEL: why-no-tests
           SLACK_USERNAME: github-actions
           SLACK_COLOR: "#2874a7"
           SLACK_ICON_EMOJI: ":rotating_light:"
+          SLACK_LINK_NAMES: true
 
       - name: Store metrics for exception cases
         uses: masci/datadog@v1
