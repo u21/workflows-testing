@@ -1,17 +1,16 @@
 name: Enforce Tests for PR
 
+# on:
+#   pull_request:
+#     types: [ labeled, synchronize ]
 on:
-  pull_request:
-    types: [ labeled, synchronize ]
+  workflow_call:
 
 #Pass test if there is a label
 jobs:
   enforce-test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository and submodules
-        uses: actions/checkout@v2
-
       - name: "Check for tests"
         uses: brettcannon/check-for-changed-files@v1
         with:

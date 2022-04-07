@@ -1,17 +1,21 @@
 name: Report Test exceptions
 
+# on:
+#   pull_request:
+#     types: [ closed ]
 on:
-  pull_request:
-    types: [ closed ]
+  workflow_call:
+    secrets:
+      SLACK_WEBHOOK:
+        required: true
+      DATADOG_API_KEY:
+        required: true
 
 jobs:
   report-test-exceptions:
     runs-on: ubuntu-latest
     if: github.event.pull_request.merged == true
     steps:
-      - name: Checkout repository and submodules
-        uses: actions/checkout@v2
-
       - name: Get PR labels
         id: pr-labels
         uses: joerick/pr-labels-action@v1.0.6
@@ -51,8 +55,27 @@ jobs:
             echo "::set-output name=size::na"
           fi
 
+  report-test-exceptions:
+    needs: [get-labels]
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true && contains(needs.get-labels.outputs.labels, ' tests-not-required ')
+    steps:
+      - name: Get PR URL
+        id: pr-url
+        uses: ammaratef45/pr-url-action@v1
+
+      - name: Report to slack if contains label
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_TITLE: Psst! Someone invoked EXCEPTION TO TESTS
+          SLACK_MESSAGE: "Test writing is skipped! Here's the PR ${{ steps.pr-url.outputs.url }}. Please explain why tests are not written for this PR."
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_CHANNEL: why-no-tests
+          SLACK_USERNAME: github-actions
+          SLACK_COLOR: "#2874a7"
+          SLACK_ICON_EMOJI: ":rotating_light:"
+
       - name: Store metrics for exception cases
-        if: contains(steps.pr-labels.outputs.labels, ' tests-not-required ')
         uses: masci/datadog@v1
         with:
           api-key: ${{ secrets.DATADOG_API_KEY }}
@@ -64,19 +87,23 @@ jobs:
               tags:
                 - "repo_name:${{ github.repository }}"
                 - "merged_by:${{ github.actor }}"
-                - "size:${{ steps.pr-size.outputs.size }}"
-      #
-      # - name: Store metrics for compliant cases
-      #   if: !contains(steps.pr-labels.outputs.labels, ' tests-not-required ')
-      #   uses: masci/datadog@v1
-      #   with:
-      #     api-key: ${{ secrets.DATADOG_API_KEY }}
-      #     metrics: |
-      #       - type: "count"
-      #         name: "test.enforcement.pr.compliance.count"
-      #         value: 1.0
-      #         host: ${{ github.repository_owner }}
-      #         tags:
-      #           - "repo_name:${{ github.repository }}"
-      #           - "merged_by:${{ github.actor }}"
-      #           - "size:${{ steps.pr-size.outputs.size }}"
+                - "size:${{ needs.get-labels.outputs.size }}"
+
+  report-test-compliance:
+    needs: [get-labels]
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true && !contains(needs.get-labels.outputs.labels, ' tests-not-required ')
+    steps:
+      - name: Store metrics for compliant cases
+        uses: masci/datadog@v1
+        with:
+          api-key: ${{ secrets.DATADOG_API_KEY }}
+          metrics: |
+            - type: "count"
+              name: "test.enforcement.pr.compliant.count"
+              value: 1.0
+              host: ${{ github.repository_owner }}
+              tags:
+                - "repo_name:${{ github.repository }}"
+                - "merged_by:${{ github.actor }}"
+                - "size:${{ needs.get-labels.outputs.size }}"
