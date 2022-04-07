@@ -18,4 +18,4 @@ jobs:
             tests/*.py
             tests/*/*.py
           skip-label: "tests not required"
-          failure-message: "Missing a tests in ${file-pattern}; please add at least one or apply the ${skip-label} label to the pull request"
+          failure-message: "Missing a tests in $file-pattern; please add at least one or apply the $skip-label label to the pull request"

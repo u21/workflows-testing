@@ -12,29 +12,16 @@ on:
         required: true
 
 jobs:
-  report-test-exceptions:
+  get-labels:
     runs-on: ubuntu-latest
     if: github.event.pull_request.merged == true
+    outputs:
+      labels: ${{ steps.pr-labels.outputs.labels }}
+      size: ${{ steps.pr-size.outputs.size }}
     steps:
       - name: Get PR labels
         id: pr-labels
         uses: joerick/pr-labels-action@v1.0.6
-
-      - name: Get PR URL
-        id: pr-url
-        uses: ammaratef45/pr-url-action@v1
-
-      - name: Report to slack if contains label
-        if: contains(steps.pr-labels.outputs.labels, ' tests-not-required ')
-        uses: rtCamp/action-slack-notify@v2
-        env:
-          SLACK_TITLE: Psst! Someone invoked EXCEPTION TO TESTS
-          SLACK_MESSAGE: "Test writing is skipped! Here's the PR ${{ steps.pr-url.outputs.url }}. Please explain why tests are not written for this PR."
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_CHANNEL: test-popo
-          SLACK_USERNAME: github-actions
-          SLACK_COLOR: "#2874a7"
-          SLACK_ICON_EMOJI: ":rotating_light:"
 
       - name: Get size label
         id: pr-size
