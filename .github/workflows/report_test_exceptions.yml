@@ -11,6 +11,7 @@ on:
       DATADOG_API_KEY:
         required: true
       SLACK_USER:
+        required: false
 
 jobs:
   get-labels:
