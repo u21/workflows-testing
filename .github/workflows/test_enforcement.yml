@@ -37,7 +37,7 @@ jobs:
         run: |
           pattern='${{ steps.files.outputs.all }}'
           for changed_file in ${{ steps.files.outputs.all }}; do
-            if [[ ${changed_file} =~ '${{ steps.files.outputs.all }}' ]]; then
+            if [[ ${changed_file} =~ ${{ steps.files.outputs.all }} ]]; then
               echo "Passed"
               exit 0
             fi
