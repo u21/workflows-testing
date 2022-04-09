@@ -6,7 +6,7 @@ name: Enforce Tests for PR
 on:
   workflow_call:
     inputs:
-      file-pattern:
+      pattern:
         description: 'A single file pattern to match'
         default: 'tests/.*/*.py'
         required: false
@@ -35,9 +35,8 @@ jobs:
 
       - name: Check for tests manual
         run: |
-          pattern='${{ steps.files.outputs.all }}'
           for changed_file in ${{ steps.files.outputs.all }}; do
-            if [[ ${changed_file} =~ ${{ steps.files.outputs.all }} ]]; then
+            if [[ ${changed_file} =~ ${{ inputs.pattern }} ]]; then
               echo "Passed"
               exit 0
             fi
