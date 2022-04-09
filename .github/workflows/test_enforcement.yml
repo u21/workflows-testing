@@ -28,13 +28,13 @@ jobs:
 
       - name: Check for tests manual
         run: |
-          file-pattern='tests/.*/*.py'
+          pattern='tests/.*/*.py'
           for changed_file in ${{ steps.files.outputs.all }}; do
-            if [[ "$changed_file" =~ "$file-pattern" ]]; then
+            if [[ "$changed_file" =~ "$pattern" ]]; then
               exit 0
             fi
           done
-          echo "Missing a tests in $file-pattern; Please add at least one test or apply the tests not required label to the pull request"
+          echo "Missing a tests in $pattern; Please add at least one test or apply the tests not required label to the pull request"
           exit 1
 
       - name: Check for tests
