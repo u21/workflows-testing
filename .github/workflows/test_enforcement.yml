@@ -8,18 +8,25 @@ on:
 
 #Pass test if there is a label
 jobs:
-  enforce-test:
+  get-label:
     runs-on: ubuntu-latest
+    outputs:
+      pr-labels: ${{ steps.pr-labels.outputs.labels }}
     steps:
       - name: Get PR labels
         id: pr-labels
         uses: joerick/pr-labels-action@v1.0.6
 
-      - id: files
+  enforce-test:
+    runs-on: ubuntu-latest
+    needs: [get-label]
+    if: !contains(needs.get-label.outputs.pr-labels, ' tests-not-required ')
+    steps:
+      - name: Get Changed Files
+        id: files
         uses: jitterbit/get-changed-files@v1
 
       - name: Check for tests manual
-        if: !contains(steps.pr-labels.outputs.labels, ' tests-not-required ')
         run: |
           file-pattern='tests/.*/*.py'
           for changed_file in ${{ steps.files.outputs.all }}; do
