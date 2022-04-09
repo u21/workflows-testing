@@ -20,14 +20,13 @@ jobs:
   enforce-test:
     needs: [get-label]
     runs-on: ubuntu-latest
-    # if: !contains(needs.get-label.outputs.pr-labels, ' tests-not-required ')
+    if: $ {{ !contains(needs.get-label.outputs.pr-labels, ' tests-not-required ') }}
     steps:
       - name: Get Changed Files
         id: files
         uses: jitterbit/get-changed-files@v1
 
       - name: Check for tests manual
-        if: $ {{ !contains(needs.get-label.outputs.pr-labels, ' tests-not-required ') }}
         run: |
           file-pattern='tests/.*/*.py'
           for changed_file in ${{ steps.files.outputs.all }}; do
