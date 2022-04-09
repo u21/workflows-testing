@@ -30,9 +30,7 @@ jobs:
         run: |
           pattern='tests/.*/*.py'
           for changed_file in ${{ steps.files.outputs.all }}; do
-            echo $changed_file
-            echo $pattern
-            if [[ "$changed_file" =~ 'tests/.*/*.py' ]]; then
+            if [[ ${changed_file} =~ ${pattern} ]]; then
               echo "Passed"
               exit 0
             fi
